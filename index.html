@@ -1,0 +1,26 @@
+<html>
+<head>
+    <meta charset="utf-8">
+	<title>Snack</title>
+	<link rel="stylesheet" type="text/css" href="css\Style.css">
+</head>
+<body>
+    hola1
+    <div id ="contenedor">
+        <canvas  id="CanvaSN1" width="400" height="400">
+        </canvas>        
+    </div>
+
+    <script>
+        var c = document.getElementById("CanvaSN1");
+        var ctx = c.getContext("2d");
+        ctx.fillStyle = "#FF0000";
+        ctx.fillRect(100,100,20,20);
+        ctx.fillStyle = "#000000";
+        ctx.fillRect(0,0,20,20);
+        ctx.fillStyle = "#e8f8f5";
+        ctx.fillRect(0,0,400,400);
+    </script>
+
+</body>
+</html>
