@@ -15,9 +15,9 @@
             var ctx = c.getContext("2d");
             var movimiento = {x:0 , y:0}; 
             var pos = {x:0 , y:0};
-            var fruta = {x:19 , y:19};
+            var fruta = {x:19 , y:19};  
             var snake = new Array ();
-            var snakeLong = 0;            
+            var snakeLong = 0;
 
             document.addEventListener('keydown', (event) => {
                 
@@ -61,12 +61,12 @@
             }
 
             function posicionarFruta(pos, snake, fruta) {
-                fruta.x = Math.floor(Math.random() * 20);
-                fruta.y = Math.floor(Math.random() * 20);
+                fruta.x = Math.floor(Math.random() * DIMENSION);
+                fruta.y = Math.floor(Math.random() * DIMENSION);
 
                 while (fruta.x != pos.x && fruta.y != pos.y && snake.indexOf(fruta) != -1) {
-                    fruta.x = Math.floor(Math.random() * 20);
-                    fruta.y = Math.floor(Math.random() * 20);
+                    fruta.x = Math.floor(Math.random() * DIMENSION);
+                    fruta.y = Math.floor(Math.random() * DIMENSION);
                 }                
             }
 /*
@@ -111,9 +111,7 @@
                 for (let i = 0; i < snakeLong; i++) {
                     pintarSnake(snake[i].x, snake[i].y);                   
                 }
-                                 
-                pintarFruta(fruta.x,fruta.y);      
-                         
+                pintarFruta(fruta.x,fruta.y);     
             }
             setInterval(jugar, 100);           
 
