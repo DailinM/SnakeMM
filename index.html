@@ -13,34 +13,30 @@
         <script>
             var c = document.getElementById("CanvaSN1");
             var ctx = c.getContext("2d");
-            var movimientoX = 0;
-            var movimientoY = 0; 
-            var posX = 0;
-            var posY = 0;
-            var frutaX = 19;
-            var frutaY = 19;
-            var snakeX = new Array ();
-            var snakeY = new Array ();
+            var movimiento = {x:0 , y:0}; 
+            var pos = {x:0 , y:0};
+            var fruta = {x:19 , y:19};
+            var snake = new Array ();
             var snakeLong = 0;            
 
             document.addEventListener('keydown', (event) => {
                 
                 switch (event.keyCode) {
                     case 37:
-                        movimientoX = -1;
-                        movimientoY = 0;
+                        movimiento.x = -1;
+                        movimiento.y = 0;
                     break;
                     case 38:
-                        movimientoX = 0;
-                        movimientoY = -1;
+                        movimiento.x = 0;
+                        movimiento.y = -1;
                     break;
                     case 39:
-                        movimientoX = 1;
-                        movimientoY = 0;
+                        movimiento.x = 1;
+                        movimiento.y = 0;
                     break;
                     case 40:
-                        movimientoX = 0;
-                        movimientoY = 1;
+                        movimiento.x = 0;
+                        movimiento.y = 1;
                     break;
                 
                 }
@@ -63,50 +59,60 @@
                 ctx.fillStyle = "#e8f8f5";
                 ctx.fillRect(0,0,c.width,c.height);
             }
-            frutaX = Math.floor(Math.random() * 20);
-            frutaY = Math.floor(Math.random() * 20);
-            snakeX.unshift(posX);
-            snakeY.unshift(posY);
+
+            function posicionarFruta(pos, snake, fruta) {
+                fruta.x = Math.floor(Math.random() * 20);
+                fruta.y = Math.floor(Math.random() * 20);
+
+                while (fruta.x != pos.x && fruta.y != pos.y && snake.indexOf(fruta) != -1) {
+                    fruta.x = Math.floor(Math.random() * 20);
+                    fruta.y = Math.floor(Math.random() * 20);
+                }                
+            }
+/*
+            function tocarCuerpoSnake(snake) {
+                if (snake.indexOf(snake[0] != -1){
+
+                }
+                
+            }
+*/
+            posicionarFruta (pos, snake, fruta);
+            snake.unshift({x:pos.x, y:pos.y});
             snakeLong = 1;  
 
             function jugar() {
                 vaciarPantalla(); 
-                posX = snakeX[0] + movimientoX;
-                posY = snakeY[0] + movimientoY;
+                pos.x = snake[0].x + movimiento.x;
+                pos.y = snake[0].y + movimiento.y;
 
-                if (posX < 0) {
-                    posX = DIMENSION -1;
+                if (pos.x < 0) {
+                    pos.x = DIMENSION -1;
                 }
-                if (posY < 0) {
-                    posY = DIMENSION -1;
+                if (pos.y < 0) {
+                    pos.y = DIMENSION -1;
                 }
-                if (posX > DIMENSION -1) {
-                    posX = 0;
+                if (pos.x > DIMENSION -1) {
+                    pos.x = 0;
                 }
-                if (posY > DIMENSION -1)  {
-                    posY = 0;
+                if (pos.y > DIMENSION -1)  {
+                    pos.y = 0;
                 }
                 
-                if (posX == frutaX && posY == frutaY) {
+                if (pos.x == fruta.x && pos.y == fruta.y) {
                     snakeLong = snakeLong + 1;
-
-                    frutaX = Math.floor(Math.random() * 20);
-                    frutaY = Math.floor(Math.random() * 20);
-                    
+                    posicionarFruta (pos, snake, fruta);
                 } else {
-                    snakeX.pop();
-                    snakeY.pop();
+                    snake.pop();
                 }
 
-
-                snakeX.unshift(posX);
-                snakeY.unshift(posY);
+                snake.unshift({x:pos.x, y:pos.y});
 
                 for (let i = 0; i < snakeLong; i++) {
-                    pintarSnake(snakeX[i], snakeY[i]);                    
+                    pintarSnake(snake[i].x, snake[i].y);                   
                 }
                                  
-                pintarFruta(frutaX,frutaY);      
+                pintarFruta(fruta.x,fruta.y);      
                          
             }
             setInterval(jugar, 100);           
