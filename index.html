@@ -57,6 +57,8 @@
                 ctx.fillStyle = "#e8f8f5";
                 ctx.fillRect(0,0,c.width,c.height);
             }
+            fruta.x = Math.floor(Math.random() * DIMENSION);
+            fruta.y = Math.floor(Math.random() * DIMENSION);
 
             function jugar() {
                 vaciarPantalla(); 
@@ -77,8 +79,7 @@
                 }
 
                 pintarSnake(pos.x, pos.y); 
-                pintarFruta(fruta.x,fruta.y);      
-                         
+                pintarFruta(fruta.x,fruta.y);                           
             }
             setInterval(jugar, 100);
             
