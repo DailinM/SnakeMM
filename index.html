@@ -13,32 +13,28 @@
         <script>
             var c = document.getElementById("CanvaSN1");
             var ctx = c.getContext("2d");
-            var movimientoX = 0;
-            var movimientoY = 0; 
-            var posX = 0;
-            var posY = 0;
-            var frutaX = 19;
-            var frutaY = 19;
-            
+            var movimiento = {x:0 , y:0}; 
+            var pos = {x:0 , y:0};
+            var fruta = {x:19 , y:19};            
 
             document.addEventListener('keydown', (event) => {
                 
                 switch (event.keyCode) {
                     case 37:
-                        movimientoX = -1;
-                        movimientoY = 0;
+                        movimiento.x = -1;
+                        movimiento.y = 0;
                     break;
                     case 38:
-                        movimientoX = 0;
-                        movimientoY = -1;
+                        movimiento.x = 0;
+                        movimiento.y = -1;
                     break;
                     case 39:
-                        movimientoX = 1;
-                        movimientoY = 0;
+                        movimiento.x = 1;
+                        movimiento.y = 0;
                     break;
                     case 40:
-                        movimientoX = 0;
-                        movimientoY = 1;
+                        movimiento.x = 0;
+                        movimiento.y = 1;
                     break;
                 
                 }
@@ -64,24 +60,24 @@
 
             function jugar() {
                 vaciarPantalla(); 
-                posX = posX + movimientoX;
-                posY = posY + movimientoY;
+                pos.x = pos.x + movimiento.x;
+                pos.y = pos.y + movimiento.y;
 
-                if (posX < 0) {
-                    posX = DIMENSION -1;
+                if (pos.x < 0) {
+                    pos.x = DIMENSION -1;
                 }
-                if (posY < 0) {
-                    posY = DIMENSION -1;
+                if (pos.y < 0) {
+                    pos.y = DIMENSION -1;
                 }
-                if (posX > DIMENSION -1) {
-                    posX = 0;
+                if (pos.x > DIMENSION -1) {
+                    pos.x = 0;
                 }
-                if (posY > DIMENSION -1)  {
-                    posY = 0;
+                if (pos.y > DIMENSION -1)  {
+                    pos.y = 0;
                 }
 
-                pintarSnake(posX, posY); 
-                pintarFruta(frutaX,frutaY);      
+                pintarSnake(pos.x, pos.y); 
+                pintarFruta(fruta.x,fruta.y);      
                          
             }
             setInterval(jugar, 100);
