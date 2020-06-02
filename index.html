@@ -15,7 +15,9 @@
             var ctx = c.getContext("2d");
             var movimiento = {x:0 , y:0}; 
             var pos = {x:0 , y:0};
-            var fruta = {x:19 , y:19};            
+            var fruta = {x:19 , y:19};  
+            var snake = new Array ();
+            var snakeLong = 0;
 
             document.addEventListener('keydown', (event) => {
                 
@@ -57,13 +59,16 @@
                 ctx.fillStyle = "#e8f8f5";
                 ctx.fillRect(0,0,c.width,c.height);
             }
+
             fruta.x = Math.floor(Math.random() * DIMENSION);
             fruta.y = Math.floor(Math.random() * DIMENSION);
+            snake.unshift({x:pos.x, y:pos.y});
+            snakeLong = 1;
 
             function jugar() {
                 vaciarPantalla(); 
-                pos.x = pos.x + movimiento.x;
-                pos.y = pos.y + movimiento.y;
+                pos.x = snake[0].x + movimiento.x;
+                pos.y = snake[0].y + movimiento.y;
 
                 if (pos.x < 0) {
                     pos.x = DIMENSION -1;
@@ -77,12 +82,26 @@
                 if (pos.y > DIMENSION -1)  {
                     pos.y = 0;
                 }
+                
+                if (pos.x == fruta.x && pos.y == fruta.y) {
+                    snakeLong = snakeLong + 1;
 
-                pintarSnake(pos.x, pos.y); 
-                pintarFruta(fruta.x,fruta.y);                           
+                    fruta.x = Math.floor(Math.random() * DIMENSION);
+                    fruta.y = Math.floor(Math.random() * DIMENSION);
+                    
+                } else {
+                    snake.pop();
+                }
+
+                snake.unshift({x:pos.x, y:pos.y});
+
+                for (let i = 0; i < snakeLong; i++) {
+                    pintarSnake(snake[i].x, snake[i].y);                   
+                }
+
+                pintarFruta(fruta.x,fruta.y);     
             }
-            setInterval(jugar, 100);
-            
+            setInterval(jugar, 100);           
 
         </script>
     </body>
