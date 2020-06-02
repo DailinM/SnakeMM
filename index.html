@@ -13,12 +13,76 @@
         <script>
             var c = document.getElementById("CanvaSN1");
             var ctx = c.getContext("2d");
-            ctx.fillStyle = "#FF0000";
-            ctx.fillRect(100,100,20,20);
-            ctx.fillStyle = "#000000";
-            ctx.fillRect(0,0,20,20);
-            ctx.fillStyle = "#e8f8f5";
-            ctx.fillRect(0,0,400,400);
+            var movimiento = {x:0 , y:0}; 
+            var pos = {x:0 , y:0};
+            var fruta = {x:19 , y:19};            
+
+            document.addEventListener('keydown', (event) => {
+                
+                switch (event.keyCode) {
+                    case 37:
+                        movimiento.x = -1;
+                        movimiento.y = 0;
+                    break;
+                    case 38:
+                        movimiento.x = 0;
+                        movimiento.y = -1;
+                    break;
+                    case 39:
+                        movimiento.x = 1;
+                        movimiento.y = 0;
+                    break;
+                    case 40:
+                        movimiento.x = 0;
+                        movimiento.y = 1;
+                    break;
+                
+                }
+                
+            });
+
+            var DIMENSION = 20;         
+            
+            function pintarFruta(x, y) {
+                ctx.fillStyle = "#FF0000";
+                ctx.fillRect(x * DIMENSION,y * DIMENSION,DIMENSION,DIMENSION);                
+            }
+            
+            function pintarSnake(x,y) {
+                ctx.fillStyle = "#000000";
+                ctx.fillRect(x * DIMENSION,y * DIMENSION,DIMENSION,DIMENSION);             
+            }
+
+            function vaciarPantalla(){
+                ctx.fillStyle = "#e8f8f5";
+                ctx.fillRect(0,0,c.width,c.height);
+            }
+
+            function jugar() {
+                vaciarPantalla(); 
+                pos.x = pos.x + movimiento.x;
+                pos.y = pos.y + movimiento.y;
+
+                if (pos.x < 0) {
+                    pos.x = DIMENSION -1;
+                }
+                if (pos.y < 0) {
+                    pos.y = DIMENSION -1;
+                }
+                if (pos.x > DIMENSION -1) {
+                    pos.x = 0;
+                }
+                if (pos.y > DIMENSION -1)  {
+                    pos.y = 0;
+                }
+
+                pintarSnake(pos.x, pos.y); 
+                pintarFruta(fruta.x,fruta.y);      
+                         
+            }
+            setInterval(jugar, 100);
+            
+
         </script>
     </body>
 </html>
