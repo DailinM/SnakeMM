@@ -5,13 +5,25 @@
 }
 
 #CanvaSN1{
+    position: absolute;
     border: 10px solid Olive !important;
-    background-color: #ffffff;      
+    background-color: #ffffff; 
+    z-index: 1;     
+    margin-left: 4%;
+    margin-top: 22%;
 }
 
 img.img1
 {
     width: 500px;
     height: 500px;  
+
+}
+
+#serpiente{
+    width: 25%;
+    height: 25%;
+    z-index: 0;
+    margin-left: 32%;
 
 }
