@@ -4,116 +4,213 @@
         <title>Snack</title>
         <link rel="stylesheet" type="text/css" href="css\Style.css">
     </head>
-    <body>
-        <div id ="contenedor">
-            <canvas  id="CanvaSN1" width="400" height="400">
-            </canvas>        
+    <body bgcolor="black">
+        <font color="Olive" face="Comic Sans MS,arial">
+        <h1 align="center"><i>Snake</i></h1>
+        <!-- 
+         style="display:none;"
+
+         
+        <div>
+            <img src="imagen\serpiente.png" width="200" height="200">
+          </div>
+           //<img id= "img1" src="imagen\serpiente.png" >
+       --> 
+        <div id= "contendorImg" style="display:none">
+          <img src="imagen\aguacate.png">
+          <img src="imagen\cereza.png"  >
+          <img src="imagen\fresa.png"   >
+          <img src="imagen\mango.png"   >
+          <img src="imagen\pinia.png"   >
+          <img src="imagen\platano.png" >
         </div>
 
+        <div id= "contendorImgSerp" style="display:none">
+            <img id = "pielSerpiente" src="imagen\pielserpiente.png" >
+        </div>
+
+        <div id ="contenedor">           
+            <canvas  id="CanvaSN1" width="800" height="800">
+            </canvas>             
+        </div>   
+        
         <script>
             var c = document.getElementById("CanvaSN1");
             var ctx = c.getContext("2d");
             var movimiento = {x:0 , y:0}; 
             var pos = {x:0 , y:0};
-            var fruta = {x:19 , y:19};  
+            var fruta = {x:0 , y:0};  
             var snake = new Array ();
             var snakeLong = 0;
+            var finJuego = false;
+            var contendorImagenes = document.getElementById('contendorImg');
+            var contendorImagenesSerp = document.getElementById('pielSerpiente');
+            var listaDeImagenes = [];
+            var usado = false;
+
+            for (let i = 0; i < contendorImagenes.childNodes.length; i++) {
+                if(contendorImagenes.childNodes[i] && contendorImagenes.childNodes[i].tagName == "IMG")
+                    listaDeImagenes.push(contendorImagenes.childNodes[i]);
+            }
+
+            var image = listaDeImagenes[0];
+            var DIMENSION = 40;
+            var cuadrosSnake = c.width/DIMENSION;
+            var pausa = false;
+
+            //console.log(listaDeImagenes, DIMENSION, cuadrosSnake );
 
             document.addEventListener('keydown', (event) => {
                 
-                switch (event.keyCode) {
-                    case 37:
-                        movimiento.x = -1;
-                        movimiento.y = 0;
-                    break;
-                    case 38:
-                        movimiento.x = 0;
-                        movimiento.y = -1;
-                    break;
-                    case 39:
-                        movimiento.x = 1;
-                        movimiento.y = 0;
-                    break;
-                    case 40:
-                        movimiento.x = 0;
-                        movimiento.y = 1;
-                    break;
-                
+                if (event.keyCode != 37 || event.keyCode != 38 || event.keyCode != 39 || event.keyCode != 40 ) {
+                    pausa = true;
+                    //console.log("2 pausa ", pausa);
+                } if (event.keyCode == 37 || event.keyCode == 38 || event.keyCode == 39 || event.keyCode == 40 ) {
+                    pausa = false;
+                    //console.log("1 pausa ", pausa);
                 }
-                
-            });
+                //console.log("usado ", usado);
+                if(usado == true){
+                    usado = false;
+                    switch (event.keyCode) {
+                        case 37:
+                            if (movimiento.x != 1){
+                                movimiento.x = -1;
+                                movimiento.y = 0;                                
+                            }
+                        break;
+                        case 38:
+                            if (movimiento.y != 1){
+                                movimiento.x = 0;
+                                movimiento.y = -1;
+                            }
+                        break;
+                        case 39:
+                            if (movimiento.x != -1){
+                                movimiento.x = 1;
+                                movimiento.y = 0;
+                            }
+                        break;
+                        case 40:
+                            if (movimiento.y != -1){
+                                movimiento.x = 0;
+                                movimiento.y = 1;
+                            }
+                        break;        
+                    }
+                }
+            });             
 
-            var DIMENSION = 20;         
-            
             function pintarFruta(x, y) {
-                ctx.fillStyle = "#FF0000";
-                ctx.fillRect(x * DIMENSION,y * DIMENSION,DIMENSION,DIMENSION);                
+                ctx.drawImage(image, x * DIMENSION, y * DIMENSION, DIMENSION ,DIMENSION );
             }
             
             function pintarSnake(x,y) {
-                ctx.fillStyle = "#000000";
-                ctx.fillRect(x * DIMENSION,y * DIMENSION,DIMENSION,DIMENSION);             
+
+                
+                ctx.drawImage(contendorImagenesSerp, x * DIMENSION, y * DIMENSION, DIMENSION ,DIMENSION );
+                //ctx.fillStyle = "#000000";
+               // ctx.fillRect(x * DIMENSION, y * DIMENSION, DIMENSION, DIMENSION);             
             }
 
             function vaciarPantalla(){
-                ctx.fillStyle = "#e8f8f5";
+                ctx.fillStyle = "#ffffff";
                 ctx.fillRect(0,0,c.width,c.height);
             }
 
-            function posicionarFruta(pos, snake, fruta) {
-                fruta.x = Math.floor(Math.random() * DIMENSION);
-                fruta.y = Math.floor(Math.random() * DIMENSION);
+            function posicionarFruta(pos, snake) {
+                fruta.x = Math.floor(Math.random() * cuadrosSnake);
+                fruta.y = Math.floor(Math.random() * cuadrosSnake);
 
-                while (fruta.x != pos.x && fruta.y != pos.y && snake.indexOf(fruta) != -1) {
-                    fruta.x = Math.floor(Math.random() * DIMENSION);
-                    fruta.y = Math.floor(Math.random() * DIMENSION);
+                while (
+                    
+                    (fruta.x == pos.x && fruta.y == pos.y) 
+                    
+                    || 
+                    
+                    coincidenciaPosicion(snake, fruta.x, fruta.y) != -1
+                    
+                    ) {
+                    fruta.x = Math.floor(Math.random() * cuadrosSnake);
+                    fruta.y = Math.floor(Math.random() * cuadrosSnake);
                 }                
             }
-/*
-            function tocarCuerpoSnake(snake) {
-                if (snake.indexOf(snake[0] != -1){
 
-                }
-                
+            function posicionarSnake(fruta) {
+                pos.x = Math.floor(Math.random() * cuadrosSnake);
+                pos.y = Math.floor(Math.random() * cuadrosSnake);
+
+                while (fruta.x == pos.x && fruta.y == pos.y) {
+                    pos.x = Math.floor(Math.random() * cuadrosSnake);
+                    pos.y = Math.floor(Math.random() * cuadrosSnake);
+                }                
             }
-*/
-            posicionarFruta (pos, snake, fruta);
+
+            function coincidenciaPosicion(snake, x, y) {          
+                for (let i = 0; i < snake.length; i++) {
+                    if(snake[i].x == x && snake[i].y == y) {
+                        return 1;
+                    }                    
+                } 
+                return -1;                           
+            }
+
+            posicionarFruta (pos, snake);
+            posicionarSnake (fruta);
             snake.unshift({x:pos.x, y:pos.y});
             snakeLong = 1;  
 
             function jugar() {
-                vaciarPantalla(); 
-                pos.x = snake[0].x + movimiento.x;
-                pos.y = snake[0].y + movimiento.y;
+                //console.log("6 pausa ", pausa);
+                if (pausa == false) {
+                    vaciarPantalla(); 
+                    if (movimiento.x != 0 || movimiento.y != 0){
+                        pos.x = snake[0].x + movimiento.x;
+                        pos.y = snake[0].y + movimiento.y;
 
-                if (pos.x < 0) {
-                    pos.x = DIMENSION -1;
-                }
-                if (pos.y < 0) {
-                    pos.y = DIMENSION -1;
-                }
-                if (pos.x > DIMENSION -1) {
-                    pos.x = 0;
-                }
-                if (pos.y > DIMENSION -1)  {
-                    pos.y = 0;
-                }
-                
-                if (pos.x == fruta.x && pos.y == fruta.y) {
-                    snakeLong = snakeLong + 1;
-                    posicionarFruta (pos, snake, fruta);
-                } else {
-                    snake.pop();
-                }
+                        if (pos.x < 0) {
+                            pos.x = cuadrosSnake -1;
+                        }
+                        if (pos.y < 0) {
+                            pos.y = cuadrosSnake -1;
+                        }
+                        if (pos.x > cuadrosSnake -1) {
+                            pos.x = 0;
+                        }
+                        if (pos.y > cuadrosSnake -1)  {
+                            pos.y = 0;
+                        }
+                        
+                        if (pos.x == fruta.x && pos.y == fruta.y) {
+                            snakeLong = snakeLong + 1;                           
+                            image = listaDeImagenes[Math.floor(Math.random() * listaDeImagenes.length)]
+                            posicionarFruta (pos, snake);
+                        } else {
+                            snake.pop();
+                        }
 
-                snake.unshift({x:pos.x, y:pos.y});
-
-                for (let i = 0; i < snakeLong; i++) {
-                    pintarSnake(snake[i].x, snake[i].y);                   
-                }
-                pintarFruta(fruta.x,fruta.y);     
+                        if (coincidenciaPosicion(snake, pos.x, pos.y) != -1){
+                            console.log("restablecer ");
+                            console.log(snake);
+                            console.log(pos.x, pos.y);
+                            console.log(movimiento.x, movimiento.y);
+                            console.log(coincidenciaPosicion(snake, pos.x, pos.y));
+                            vaciarPantalla(); 
+                            finJuego =  true;
+                        }
+                        snake.unshift({x:pos.x, y:pos.y});                
+                    }
+                    if (finJuego == false) {
+                        for (let i = 0; i < snakeLong; i++) {
+                            pintarSnake(snake[i].x, snake[i].y);                   
+                        }
+                        pintarFruta(fruta.x,fruta.y); 
+                    } 
+                    usado = true;                   
+                }                
             }
-            setInterval(jugar, 100);           
+            setInterval(jugar, 100);  
+            //clearInterval(myVar);         
 
         </script>
     </body>
