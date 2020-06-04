@@ -7,15 +7,6 @@
     <body bgcolor="black"> 
         <font color="Olive" face="Comic Sans MS,arial">
         <h1 align="center"><i>Snake</i></h1>     
-        <!-- 
-         style="display:none;"
-
-         
-        <div>
-            <img src="imagen\serpiente.png" width="200" height="200">
-          </div>
-           //<img id= "img1" src="imagen\serpiente.png" >
-       --> 
         <div id= "contendorImg" style="display:none">
           <img src="imagen\aguacate.png">
           <img src="imagen\cereza.png"  >
@@ -39,17 +30,22 @@
         <script>
             var c = document.getElementById("CanvaSN1");
             var ctx = c.getContext("2d");
-            var movimiento = {x:0 , y:0}; 
-            var pos = {x:0 , y:0};
-            var fruta = {x:0 , y:0};  
-            var snake = new Array ();
-            var snakeLong = 0;
-            var finJuego = false;
             var contendorImagenes = document.getElementById('contendorImg');
             var contendorImagenesSerp = document.getElementById('pielSerpiente');
             var contendorCabezaSerp = document.getElementById('cabezaSerpiente');
-            var listaDeImagenes = [];
-            var usado = false;            
+            var listaDeImagenes = [];               
+            var interval = {facil:300 , dificil:100};
+            var DIMENSION = 40;
+            var CUADROSNAKE = c.width/DIMENSION;
+            var intervalID = 0;             
+            var movimiento = null; 
+            var pos = null;
+            var fruta = null;  
+            var snake = null;
+            var snakeLong = null;
+            var finJuego = null;
+            var usado = null;
+            var pausa = null;
 
             for (let i = 0; i < contendorImagenes.childNodes.length; i++) {
                 if(contendorImagenes.childNodes[i] && contendorImagenes.childNodes[i].tagName == "IMG")
@@ -57,17 +53,8 @@
             }
 
             var image = listaDeImagenes[0];
-            var DIMENSION = 40;
-            var cuadrosSnake = c.width/DIMENSION;
-            var pausa = false;
-            var activarJuegoL1 = false;    
-            var activarJuegoL2 = false;          
 
-            function menu() {
-
-                var nivelFacil = "* Facil";
-                var nivelFuerte = "* Dificil";
-
+            function estiloGradientFont() {
                 ctx.font = "100px Candara";
                 var gradient = ctx.createLinearGradient(0, 0, c.width, 0);
                 gradient.addColorStop("0", "olive");
@@ -75,63 +62,183 @@
                 gradient.addColorStop("1.0", "Black"); 
                 ctx.fillStyle = gradient;
                 ctx.textAlign = "center";
-                ctx.textBaseline = "middle";        
+                ctx.textBaseline = "middle";               
+            }     
+
+            function inicializarJuego() {
+                movimiento = {x:0 , y:0}; 
+                pos = {x:0 , y:0};
+                fruta = {x:0 , y:0};  
+                snake = new Array ();
+                snakeLong = 0;
+                finJuego = false;
+                usado = false;
+                pausa = false;
+                posicionarFruta (pos, snake);
+                posicionarSnake (fruta);
+                snake.unshift({x:pos.x, y:pos.y});
+                snakeLong = 1;                
+            }
+
+            function vaciarPantalla(){
+                ctx.fillStyle = "#ffffff";
+                ctx.fillRect(0,0,c.width,c.height);
+            }
+
+            function menu() {  
+                vaciarPantalla();
+                estiloGradientFont(); 
                 ctx.fillText("Nivel:", c.width/2, c.height/4); 
                 ctx.textAlign = "left"; 
-                ctx.fillText(nivelFacil, c.width/3, c.height/2,);            
-                ctx.fillText(nivelFuerte, c.width/3, c.height/1.5);  
-         
+                ctx.fillText("* Facil", c.width/3, c.height/2,);            
+                ctx.fillText("* Dificil", c.width/3, c.height/1.5); 
+                   
             }
 
             function gameOver() {
-                ctx.font = "100px Candara";
-                var gradient = ctx.createLinearGradient(0, 0, c.width, 0);
-                gradient.addColorStop("0", "olive");
-                gradient.addColorStop("0.5", "Cyan");
-                gradient.addColorStop("1.0", "Black"); 
-                ctx.fillStyle = gradient;
-                ctx.textAlign = "center";
-                ctx.textBaseline = "middle";            
-                ctx.fillText("Game over", c.width/2, c.height/2);   
+                vaciarPantalla();  
+                estiloGradientFont();          
+                ctx.fillText("Game over", c.width/2, c.height/2);
+                clearInterval(intervalID);
+                inicializarJuego();
+                var newGameId = setInterval(newGame, 1000);
+                function newGame() {
+                    menu();
+                    clearInterval(newGameId);                    
+                }             
+            }
 
-                }
-            menu();
+            function iniciaDificultad(nivel) {
+                vaciarPantalla();
+                jugar();
+                intervalID = setInterval(jugar, nivel);                 
+            }
 
-            c.addEventListener('click', checkStart, false);
-
-            function checkStart(e) {
-                var p = getMousePos(e);
-                console.log ("reconocimiento de click");
-                console.log ("posicion mouse", p.x, p.y);
-
+            function elegirDificultad(e) {
+                var p = evaluacionClickDificultad(e);
                 if (p.x >= 280 && p.x <= 280 + 251 &&
                     p.y >= 361 && p.y <= 361 + 73) {
-                        console.log ("entro");
-                        vaciarPantalla();
-                        jugar();
-                        setInterval(jugar, 300); 
+                        iniciaDificultad(interval.facil); 
                 } else if (p.x >= 280 && p.x <= 280 + 292 &&
-                           p.y >= 495 && p.y <= 495 + 73) {  
-                            console.log ("entro");                     
-                        vaciarPantalla();
-                        jugar();
-                        setInterval(jugar, 100); 
-                        
+                           p.y >= 495 && p.y <= 495 + 73) {           
+                        iniciaDificultad(interval.dificil);                     
                 } else {
                     menu();
                 }
-                
             }
 
-            function getMousePos(e) {
+            function evaluacionClickDificultad(e) {
                 var r = c.getBoundingClientRect();  
                 return {
                     x: e.clientX - r.left,
                     y: e.clientY - r.top                    
                 };
-            
             }
 
+            function posicionarFruta(pos, snake) {
+                fruta.x = Math.floor(Math.random() * CUADROSNAKE);
+                fruta.y = Math.floor(Math.random() * CUADROSNAKE);
+
+                while (  (fruta.x == pos.x && fruta.y == pos.y)  || coincidenciaPosicion(snake, fruta.x, fruta.y) != -1 ) {
+                    fruta.x = Math.floor(Math.random() * CUADROSNAKE);
+                    fruta.y = Math.floor(Math.random() * CUADROSNAKE);
+                }                
+            }
+
+            function posicionarSnake(fruta) {
+                pos.x = Math.floor(Math.random() * CUADROSNAKE);
+                pos.y = Math.floor(Math.random() * CUADROSNAKE);
+
+                while (fruta.x == pos.x && fruta.y == pos.y) {
+                    pos.x = Math.floor(Math.random() * CUADROSNAKE);
+                    pos.y = Math.floor(Math.random() * CUADROSNAKE);
+                }                
+            }
+
+            function coincidenciaPosicion(snake, x, y) {          
+                for (let i = 0; i < snake.length; i++) {
+                    if(snake[i].x == x && snake[i].y == y) {
+                        return 1;
+                    }                    
+                } 
+                return -1;                           
+            }
+
+            function pintarFruta(x, y) {
+                ctx.drawImage(image, x * DIMENSION, y * DIMENSION, DIMENSION ,DIMENSION );
+            }
+            
+            function pintarSnake(x,y, valor) {
+                if (valor == 1){
+                    ctx.drawImage(contendorImagenesSerp, x * DIMENSION, y * DIMENSION, DIMENSION ,DIMENSION );   
+                } else {
+                    ctx.drawImage(contendorCabezaSerp, x * DIMENSION, y * DIMENSION, DIMENSION ,DIMENSION );   
+                }      
+            }
+
+            function jugar() {
+                if (pausa == false) {
+                    vaciarPantalla(); 
+                    if (movimiento.x != 0 || movimiento.y != 0){
+                        pos.x = snake[0].x + movimiento.x;
+                        pos.y = snake[0].y + movimiento.y;
+
+                        if (pos.x < 0) {
+                            pos.x = CUADROSNAKE -1;
+                        }
+                        if (pos.y < 0) {
+                            pos.y = CUADROSNAKE -1;
+                        }
+                        if (pos.x > CUADROSNAKE -1) {
+                            pos.x = 0;
+                        }
+                        if (pos.y > CUADROSNAKE -1)  {
+                            pos.y = 0;
+                        }
+                        
+                        if (pos.x == fruta.x && pos.y == fruta.y) {
+                            snakeLong = snakeLong + 1;                           
+                            image = listaDeImagenes[Math.floor(Math.random() * listaDeImagenes.length)]
+                            posicionarFruta (pos, snake);
+                        } else {
+                            snake.pop();
+                        }
+
+                        if (coincidenciaPosicion(snake, pos.x, pos.y) != -1){
+                            console.log("restablecer ");
+                            console.log(snake);
+                            console.log(pos.x, pos.y);
+                            console.log(movimiento.x, movimiento.y);
+                            console.log(coincidenciaPosicion(snake, pos.x, pos.y));
+                            vaciarPantalla();                              
+                            finJuego =  true;
+                            
+                            
+                        }
+                        snake.unshift({x:pos.x, y:pos.y});                
+                    }
+                    if (finJuego == false) {
+                        for (let i = 0; i < snakeLong; i++) {
+                            if (i == 0) {
+                                pintarSnake(snake[i].x, snake[i].y, 0);
+                            } else {
+                                pintarSnake(snake[i].x, snake[i].y, 1);       
+                            }                                                                        
+                        }
+                        pintarFruta(fruta.x,fruta.y); 
+                    } else {     
+                        gameOver();                                  
+                    }
+                    usado = true;                   
+                }                             
+            }             
+               
+            menu();
+
+            c.addEventListener('click', elegirDificultad, false);
+
+            inicializarJuego();            
+            
             document.addEventListener('keydown', (event) => {
                 
                 if (event.keyCode != 37 || event.keyCode != 38 || event.keyCode != 39 || event.keyCode != 40 ) {
@@ -169,125 +276,7 @@
                     }
                 }
             });            
-
-            function pintarFruta(x, y) {
-                ctx.drawImage(image, x * DIMENSION, y * DIMENSION, DIMENSION ,DIMENSION );
-            }
-            
-            function pintarSnake(x,y, valor) {
-                if (valor == 1){
-                    ctx.drawImage(contendorImagenesSerp, x * DIMENSION, y * DIMENSION, DIMENSION ,DIMENSION );   
-                } else {
-                    ctx.drawImage(contendorCabezaSerp, x * DIMENSION, y * DIMENSION, DIMENSION ,DIMENSION );   
-                }
-                
-                       
-            }
-
-            function vaciarPantalla(){
-                ctx.fillStyle = "#ffffff";
-                ctx.fillRect(0,0,c.width,c.height);
-            }
-
-            function posicionarFruta(pos, snake) {
-                fruta.x = Math.floor(Math.random() * cuadrosSnake);
-                fruta.y = Math.floor(Math.random() * cuadrosSnake);
-
-                while (
-                    
-                    (fruta.x == pos.x && fruta.y == pos.y) 
-                    
-                    || 
-                    
-                    coincidenciaPosicion(snake, fruta.x, fruta.y) != -1
-                    
-                    ) {
-                    fruta.x = Math.floor(Math.random() * cuadrosSnake);
-                    fruta.y = Math.floor(Math.random() * cuadrosSnake);
-                }                
-            }
-
-            function posicionarSnake(fruta) {
-                pos.x = Math.floor(Math.random() * cuadrosSnake);
-                pos.y = Math.floor(Math.random() * cuadrosSnake);
-
-                while (fruta.x == pos.x && fruta.y == pos.y) {
-                    pos.x = Math.floor(Math.random() * cuadrosSnake);
-                    pos.y = Math.floor(Math.random() * cuadrosSnake);
-                }                
-            }
-
-            function coincidenciaPosicion(snake, x, y) {          
-                for (let i = 0; i < snake.length; i++) {
-                    if(snake[i].x == x && snake[i].y == y) {
-                        return 1;
-                    }                    
-                } 
-                return -1;                           
-            }
-
-            posicionarFruta (pos, snake);
-            posicionarSnake (fruta);
-            snake.unshift({x:pos.x, y:pos.y});
-            snakeLong = 1;  
-
-            function jugar() {
-                //console.log("6 pausa ", pausa);
-                if (pausa == false) {
-                    vaciarPantalla(); 
-                    if (movimiento.x != 0 || movimiento.y != 0){
-                        pos.x = snake[0].x + movimiento.x;
-                        pos.y = snake[0].y + movimiento.y;
-
-                        if (pos.x < 0) {
-                            pos.x = cuadrosSnake -1;
-                        }
-                        if (pos.y < 0) {
-                            pos.y = cuadrosSnake -1;
-                        }
-                        if (pos.x > cuadrosSnake -1) {
-                            pos.x = 0;
-                        }
-                        if (pos.y > cuadrosSnake -1)  {
-                            pos.y = 0;
-                        }
-                        
-                        if (pos.x == fruta.x && pos.y == fruta.y) {
-                            snakeLong = snakeLong + 1;                           
-                            image = listaDeImagenes[Math.floor(Math.random() * listaDeImagenes.length)]
-                            posicionarFruta (pos, snake);
-                        } else {
-                            snake.pop();
-                        }
-
-                        if (coincidenciaPosicion(snake, pos.x, pos.y) != -1){
-                            console.log("restablecer ");
-                            console.log(snake);
-                            console.log(pos.x, pos.y);
-                            console.log(movimiento.x, movimiento.y);
-                            console.log(coincidenciaPosicion(snake, pos.x, pos.y));
-                            vaciarPantalla();                              
-                            finJuego =  true;
-                            
-                            
-                        }
-                        snake.unshift({x:pos.x, y:pos.y});                
-                    }
-                    if (finJuego == false) {
-                        for (let i = 0; i < snakeLong; i++) {
-                            if (i == 0) {
-                                pintarSnake(snake[i].x, snake[i].y, 0);
-                            } else {
-                                pintarSnake(snake[i].x, snake[i].y, 1);       
-                            }                                                                        
-                        }
-                        pintarFruta(fruta.x,fruta.y); 
-                    } else {
-                        gameOver();
-                    }
-                    usado = true;                   
-                }                
-            }             
+          
             
         </script>
     </body>

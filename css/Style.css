@@ -9,8 +9,8 @@
     border: 10px solid Olive !important;
     background-color: #ffffff; 
     z-index: 1;     
-    margin-left: 4%;
-    margin-top: 22%;
+    margin-left: 2%;
+    margin-top: 20%;
 }
 
 img.img1
@@ -21,8 +21,8 @@ img.img1
 }
 
 #serpiente{
-    width: 25%;
-    height: 25%;
+    width: 15%;
+    height: 15%;
     z-index: 0;
     margin-left: 32%;
 
