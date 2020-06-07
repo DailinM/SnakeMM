@@ -24,7 +24,6 @@
         <div style="display:none"> 
             <img id = "cabezaSerpiente" src="imagen\cabezaserpiente.png">           
             <img id = "pielSerpiente"   src="imagen\pielSerpiente.png">
-            <img id = "colaSerpiente"   src="imagen\colaSerpiente.png">
             
         </div>   
 
@@ -52,8 +51,7 @@
             var ctx = c.getContext("2d");
             var contendorImagenes = document.getElementById('contendorImg');
             var cabezaSnake = document.getElementById('cabezaSerpiente');
-            var pielSnake = document.getElementById('pielSerpiente');
-            var colaSerpiente = document.getElementById('colaSerpiente');   
+            var pielSnake = document.getElementById('pielSerpiente');  
             var botonJuego =  document.getElementById('botonJugar');      
             var botonFacil = document.getElementById('botonFacil'); 
             var botonDificil = document.getElementById('botonDificil');     
@@ -233,8 +231,6 @@
                         for (let i = 0; i < snakeLong; i++) {
                             if (i == 0) {
                                 pintarImagen(ctx, cabezaSnake, snake[i], DIMENSION);
-                            } else if(i == (snakeLong-1)){
-                                pintarImagen(ctx, pielSnake, snake[i], DIMENSION);  
                             } else{
                                 pintarImagen(ctx, pielSnake, snake[i], DIMENSION);
                             }
