@@ -1,12 +1,112 @@
-#contenedor {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
+
+body{
+    background-image: url(../imagen/fondo_pantalla_selva.png);
+    background-size: cover;
+    background-attachment: fixed;
+	background-repeat: no-repeat;
+	/*min-width:600px;*/
+}
+
+.cabecera{
+	text-align:center;
+	padding: 15px;
+}
+
+.left {	
+	padding:20px;
+	float:left;
+	width:45%; /* The width is 20%, by default */
+  }
+
+.timepo, .pts, .ptsAnt {
+background-color:#2b580c;
+padding:8px;
+margin-top:60px;
+display:block;
+width:100%;
+color:#d9bf77;
+}
+
+.organizarDatos{	
+	padding:20px;
+	float:right;
+	width:35%; 
+}  
+
+.contenedorCanvas {
+	float:left;
+	width:50%;
+	padding:0 20px;
+	max-width:100%;
+	height:auto; 
+	z-index: 0;  
+	position:relative;
 }
 
 #CanvaSN1{
-    border: 4px solid black !important;
-    background-color: #e8f8f5;      
+    
+    border: 10px solid #be7575 !important;
+    background-color: #ffffff; 
+	z-index: 1;   
+	max-width:100%;
+	height:auto;    
 }
+
+a.botonJugarFlotante, a.botonFacilFlotante, a.botonDificilFlotante{
+	font-size: 18px; /* Cambiar el tamaño de la tipografia */
+	text-transform: uppercase; /* Texto en mayusculas */
+	font-weight: bold; /* Fuente en negrita o bold */
+	color: #d9bf77; /* Color del texto */
+	border-radius: 5px; /* Borde del boton */
+	letter-spacing: 2px; /* Espacio entre letras */
+	background-color: #be7575; /* Color de fondo */
+	padding: 18px 30px; /* Relleno del boton  position: fixed;*/	
+	transition: all 300ms ease 0ms;
+	box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);	
+}
+
+a.botonJugarFlotante {
+	width: 500px;
+	left: 20px;
+	top: 100px;
+	position: absolute;	
+}
+
+a.botonFacilFlotante {
+	width: 150px;
+	left: 190px;
+	top: 250px;
+	position: absolute;	
+}
+
+a.botonDificilFlotante {
+	width: 150px;
+	left: 190px;
+	top: 350px;
+	position: absolute;	
+}
+
+.botonJugarFlotante:hover, .botonFacilFlotante:hover, .botonDificilFlotante:hover {
+	background-color: #2b580c; /* Color de fondo al pasar el cursor */
+	box-shadow: 0px 15px 20px rgba(0, 0, 0, 0.3);
+	transform: translateY(-7px);
+	color: #d9bf77; /* Color del texto */
+}
+
+/*
+@media only screen and (max-width: 800px) {
+	.botonJugarFlotante {
+	   font-size: 14px;
+	   padding: 12px 20px;
+	   bottom: 20px;
+	   right: 20px;
+   }
+} 
+
+
+@media screen and (max-width:800px) {
+  .left, .contenedorCanvas{
+    width:100%;  The width is 100%, when the viewport is 800px or smaller 
+}
+
+*/
