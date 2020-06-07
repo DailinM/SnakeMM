@@ -1,12 +1,17 @@
 <html>
     <head>
         <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Snack</title>
         <link rel="stylesheet" type="text/css" href="css\Style.css">
+        <link rel="stylesheet" type="text/css" href="css\bootstrap.min.css">
     </head>
-    <body bgcolor="black"> 
-        <font color="Olive" face="Comic Sans MS,arial">
-        <h1 align="center"><i>Snake</i></h1>     
+    <body> 
+        <font color="#d9bf77" face="Comic Sans MS,arial">
+        <div class ="cabecera">      
+            <h1 style="font-size:10vw; text-align:center;">Snake</h1>
+        </div> 
+
         <div id= "contendorImg" style="display:none">
           <img src="imagen\aguacate.png">
           <img src="imagen\cereza.png"  >
@@ -15,46 +20,65 @@
           <img src="imagen\diamante.png" >
           <img src="imagen\platano.png" >
         </div>
+        
+        <div style="display:none"> 
+            <img id = "cabezaSerpiente" src="imagen\cabezaserpiente.png">           
+            <img id = "pielSerpiente"   src="imagen\pielSerpiente.png">
+            <img id = "colaSerpiente"   src="imagen\colaSerpiente.png">
+            
+        </div>   
 
-        <div id= "contendorImgSerp" style="display:none">            
-            <img id = "pielSerpiente" src="imagen\pielserpiente1.png" >
-            <img id = "cabezaSerpiente" src="imagen\cabezaserpiente.png" >
+        <div class="left">  
+            <div class = "organizarDatos">         
+                <div class="timepo"><p>Tiempo</p></div>
+                <div class="pts"><p>Puntaje</p></div>
+                <div class="ptsAnt"><p>Puntaje Anterior</p></div>
+            </div>             
         </div>
-
-        <div id ="contenedor">   
-            <img id="serpiente" src="imagen\serpiente2.png" >        
+        
+        <div class ="contenedorCanvas"> 
+            <div id = "botonFacil"><a class="botonFacilFlotante" role = "button">Facil</a></div> 
+            <div id = "botonDificil"><a class="botonDificilFlotante" role="button">Dificil</a></div>             
+            <div id = "botonJugar" ><a class="botonJugarFlotante" role="button">Jugar</a></div> 
             <canvas  id="CanvaSN1" width="800" height="800">
             </canvas>             
         </div> 
-        
+        <!--
+           
+        -->       
+
         <script>
             var c = document.getElementById("CanvaSN1");
             var ctx = c.getContext("2d");
             var contendorImagenes = document.getElementById('contendorImg');
-            var contendorImagenesSerp = document.getElementById('pielSerpiente');
-            var contendorCabezaSerp = document.getElementById('cabezaSerpiente');
+            var cabezaSnake = document.getElementById('cabezaSerpiente');
+            var pielSnake = document.getElementById('pielSerpiente');
+            var colaSerpiente = document.getElementById('colaSerpiente');   
+            var botonJuego =  document.getElementById('botonJugar');      
+            var botonFacil = document.getElementById('botonFacil'); 
+            var botonDificil = document.getElementById('botonDificil');     
             var listaDeImagenes = [];               
-            var interval = {facil:300 , dificil:100};
+            var velocidadMovimiento = {facil:300 , dificil:100};
             var DIMENSION = 40;
             var CUADROSNAKE = c.width/DIMENSION;
-            var intervalID = 0;             
-            var movimiento = null; 
-            var pos = null;
-            var fruta = null;  
-            var snake = null;
-            var snakeLong = null;
-            var finJuego = null;
-            var usado = null;
-            var pausa = null;
+            var intervalID = 0        
+                ,movimiento = null
+                ,pos = null
+                ,fruta = null 
+                ,snake = null
+                ,snakeLong = null
+                ,finJuego = null
+                ,movimientoProcesado = null
+                ,pausa = null;
 
             for (let i = 0; i < contendorImagenes.childNodes.length; i++) {
                 if(contendorImagenes.childNodes[i] && contendorImagenes.childNodes[i].tagName == "IMG")
                     listaDeImagenes.push(contendorImagenes.childNodes[i]);
             }
 
-            var image = listaDeImagenes[0];
+            var imageFruta = listaDeImagenes[0];
 
-            function estiloGradientFont() {
+            function aplicarEstiloDegradadoLetras() {
                 ctx.font = "100px Candara";
                 var gradient = ctx.createLinearGradient(0, 0, c.width, 0);
                 gradient.addColorStop("0", "olive");
@@ -63,16 +87,59 @@
                 ctx.fillStyle = gradient;
                 ctx.textAlign = "center";
                 ctx.textBaseline = "middle";               
-            }     
+            }  
 
-            function inicializarJuego() {
+            function ocultarBoton(elementoVisible){
+                elementoVisible.style.display = 'none';
+            }
+
+            function mostrarBoton(elementoOculto){
+                elementoOculto.style.display = 'block';
+                
+            }
+
+            function escucharAccionBoton(elementoClick, tipoDificultad){
+                elementoClick.addEventListener('click', function(ev) {
+                    if (elementoClick == botonJuego){
+                        mostrarBoton(botonFacil);
+                        mostrarBoton(botonDificil);
+                        botonJuego.style.pointerEvents = 'none';  
+                    } else {
+                        ocultarBoton(botonFacil);
+                        ocultarBoton(botonDificil);
+                        ocultarBoton(botonJuego);
+                        iniciaJuego(tipoDificultad); 
+                    }                      
+                }, false);
+            }
+
+            function asignarValorRandom(limiteMaximo) {
+                return {
+                    x: Math.floor(Math.random() * limiteMaximo),
+                    y: Math.floor(Math.random() * limiteMaximo)              
+                };
+            }
+
+            function compararUbicacionObjetos(valorA, valorB) {
+                if (valorA.x == valorB.x && valorA.y == valorB.y) {
+                    return true;
+                } else {
+                    return false;
+                }                
+            }
+
+            function pintarImagen(contexto, imagenSeleccionada, posicionImgagen, dimensionImagen, nuevaDimension){
+                contexto.drawImage(imagenSeleccionada, posicionImgagen.x * dimensionImagen, posicionImgagen.y * dimensionImagen, dimensionImagen ,dimensionImagen );            
+            } 
+
+            function reiniciarValores() {
                 movimiento = {x:0 , y:0}; 
                 pos = {x:0 , y:0};
                 fruta = {x:0 , y:0};  
                 snake = new Array ();
                 snakeLong = 0;
                 finJuego = false;
-                usado = false;
+                movimientoProcesado = false;
                 pausa = false;
                 posicionarFruta (pos, snake);
                 posicionarSnake (fruta);
@@ -84,98 +151,51 @@
                 ctx.fillStyle = "#ffffff";
                 ctx.fillRect(0,0,c.width,c.height);
             }
-
-            function menu() {  
-                vaciarPantalla();
-                estiloGradientFont(); 
-                ctx.fillText("Nivel:", c.width/2, c.height/4); 
-                ctx.textAlign = "left"; 
-                ctx.fillText("* Facil", c.width/3, c.height/2,);            
-                ctx.fillText("* Dificil", c.width/3, c.height/1.5); 
-                   
-            }
-
+            
             function gameOver() {
                 vaciarPantalla();  
-                estiloGradientFont();          
+                aplicarEstiloDegradadoLetras();          
                 ctx.fillText("Game over", c.width/2, c.height/2);
                 clearInterval(intervalID);
-                inicializarJuego();
+                reiniciarValores();
                 var newGameId = setInterval(newGame, 1000);
                 function newGame() {
-                    menu();
+                    vaciarPantalla();
+                    mostrarBoton(botonJuego);
+                    botonJuego.style.pointerEvents = 'auto';  
                     clearInterval(newGameId);                    
                 }             
             }
 
-            function iniciaDificultad(nivel) {
+            function iniciaJuego(Dificultad) {
                 vaciarPantalla();
                 jugar();
-                intervalID = setInterval(jugar, nivel);                 
+                intervalID = setInterval(jugar, Dificultad);                 
             }
 
-            function elegirDificultad(e) {
-                var p = evaluacionClickDificultad(e);
-                if (p.x >= 280 && p.x <= 280 + 251 &&
-                    p.y >= 361 && p.y <= 361 + 73) {
-                        iniciaDificultad(interval.facil); 
-                } else if (p.x >= 280 && p.x <= 280 + 292 &&
-                           p.y >= 495 && p.y <= 495 + 73) {           
-                        iniciaDificultad(interval.dificil);                     
-                } else {
-                    menu();
-                }
-            }
-
-            function evaluacionClickDificultad(e) {
-                var r = c.getBoundingClientRect();  
-                return {
-                    x: e.clientX - r.left,
-                    y: e.clientY - r.top                    
-                };
-            }
-
-            function posicionarFruta(pos, snake) {
-                fruta.x = Math.floor(Math.random() * CUADROSNAKE);
-                fruta.y = Math.floor(Math.random() * CUADROSNAKE);
-
-                while (  (fruta.x == pos.x && fruta.y == pos.y)  || coincidenciaPosicion(snake, fruta.x, fruta.y) != -1 ) {
-                    fruta.x = Math.floor(Math.random() * CUADROSNAKE);
-                    fruta.y = Math.floor(Math.random() * CUADROSNAKE);
+            function posicionarFruta(posSnake, valorSnake) {
+                fruta = asignarValorRandom(CUADROSNAKE); 
+                while (  compararUbicacionObjetos(fruta, posSnake)  || coincidenciaPosicionSnake(valorSnake, fruta) != -1 ) {
+                    fruta = asignarValorRandom(CUADROSNAKE);
                 }                
             }
 
-            function posicionarSnake(fruta) {
-                pos.x = Math.floor(Math.random() * CUADROSNAKE);
-                pos.y = Math.floor(Math.random() * CUADROSNAKE);
-
-                while (fruta.x == pos.x && fruta.y == pos.y) {
-                    pos.x = Math.floor(Math.random() * CUADROSNAKE);
-                    pos.y = Math.floor(Math.random() * CUADROSNAKE);
+            function posicionarSnake(posicionFrutaAct) {
+                pos = asignarValorRandom(CUADROSNAKE);                
+                while (compararUbicacionObjetos(posicionFrutaAct, pos)) {
+                    pos = asignarValorRandom(CUADROSNAKE);
                 }                
             }
 
-            function coincidenciaPosicion(snake, x, y) {          
-                for (let i = 0; i < snake.length; i++) {
-                    if(snake[i].x == x && snake[i].y == y) {
+            function coincidenciaPosicionSnake(valorSnake, cordenadaXY) {          
+                for (let i = 0; i < valorSnake.length; i++) {
+                    if(valorSnake[i].x == cordenadaXY.x && valorSnake[i].y == cordenadaXY.y) {
                         return 1;
                     }                    
                 } 
                 return -1;                           
             }
-
-            function pintarFruta(x, y) {
-                ctx.drawImage(image, x * DIMENSION, y * DIMENSION, DIMENSION ,DIMENSION );
-            }
             
-            function pintarSnake(x,y, valor) {
-                if (valor == 1){
-                    ctx.drawImage(contendorImagenesSerp, x * DIMENSION, y * DIMENSION, DIMENSION ,DIMENSION );   
-                } else {
-                    ctx.drawImage(contendorCabezaSerp, x * DIMENSION, y * DIMENSION, DIMENSION ,DIMENSION );   
-                }      
-            }
-
             function jugar() {
                 if (pausa == false) {
                     vaciarPantalla(); 
@@ -195,79 +215,74 @@
                         if (pos.y > CUADROSNAKE -1)  {
                             pos.y = 0;
                         }
-                        
-                        if (pos.x == fruta.x && pos.y == fruta.y) {
+                                                
+                        if (compararUbicacionObjetos(pos, fruta)) {
                             snakeLong = snakeLong + 1;                           
-                            image = listaDeImagenes[Math.floor(Math.random() * listaDeImagenes.length)]
+                            image = listaDeImagenes[asignarValorRandom(listaDeImagenes.length)]
                             posicionarFruta (pos, snake);
                         } else {
                             snake.pop();
                         }
 
-                        if (coincidenciaPosicion(snake, pos.x, pos.y) != -1){
-                            console.log("restablecer ");
-                            console.log(snake);
-                            console.log(pos.x, pos.y);
-                            console.log(movimiento.x, movimiento.y);
-                            console.log(coincidenciaPosicion(snake, pos.x, pos.y));
-                            vaciarPantalla();                              
-                            finJuego =  true;
-                            
-                            
+                        if (coincidenciaPosicionSnake(snake, pos) != -1){                            
+                            finJuego =  true;  
                         }
                         snake.unshift({x:pos.x, y:pos.y});                
                     }
                     if (finJuego == false) {
                         for (let i = 0; i < snakeLong; i++) {
                             if (i == 0) {
-                                pintarSnake(snake[i].x, snake[i].y, 0);
-                            } else {
-                                pintarSnake(snake[i].x, snake[i].y, 1);       
-                            }                                                                        
-                        }
-                        pintarFruta(fruta.x,fruta.y); 
+                                pintarImagen(ctx, cabezaSnake, snake[i], DIMENSION);
+                            } else if(i == (snakeLong-1)){
+                                pintarImagen(ctx, pielSnake, snake[i], DIMENSION);  
+                            } else{
+                                pintarImagen(ctx, pielSnake, snake[i], DIMENSION);
+                            }
+                        }                        
+                        pintarImagen(ctx, imageFruta, fruta, DIMENSION,null);
                     } else {     
                         gameOver();                                  
                     }
-                    usado = true;                   
+                    movimientoProcesado = true;                   
                 }                             
-            }             
-               
-            menu();
-
-            c.addEventListener('click', elegirDificultad, false);
-
-            inicializarJuego();            
+            }     
             
-            document.addEventListener('keydown', (event) => {
+            ocultarBoton(botonFacil);
+            ocultarBoton(botonDificil);
+            escucharAccionBoton(botonJuego, 1);
+            escucharAccionBoton(botonFacil, velocidadMovimiento.facil);
+            escucharAccionBoton(botonDificil, velocidadMovimiento.dificil);
+            reiniciarValores();  
+            document.addEventListener('keydown', (event) => {               
                 
-                if (event.keyCode != 37 || event.keyCode != 38 || event.keyCode != 39 || event.keyCode != 40 ) {
-                    pausa = true;
-                } if (event.keyCode == 37 || event.keyCode == 38 || event.keyCode == 39 || event.keyCode == 40 ) {
+                if (event.keyCode == 65 || event.keyCode == 87 || event.keyCode == 68 || event.keyCode == 83  ) {
                     pausa = false;
+                } else {
+                    pausa = true;
                 }
-                if(usado == true){
-                    usado = false;
+
+                if(movimientoProcesado == true){
+                    movimientoProcesado = false;
                     switch (event.keyCode) {
-                        case 37:
+                        case 65:
                             if (movimiento.x != 1){
                                 movimiento.x = -1;
                                 movimiento.y = 0;                                
                             }
                         break;
-                        case 38:
+                        case 87:
                             if (movimiento.y != 1){
                                 movimiento.x = 0;
                                 movimiento.y = -1;
                             }
                         break;
-                        case 39:
+                        case 68:
                             if (movimiento.x != -1){
                                 movimiento.x = 1;
                                 movimiento.y = 0;
                             }
                         break;
-                        case 40:
+                        case 83 :
                             if (movimiento.y != -1){
                                 movimiento.x = 0;
                                 movimiento.y = 1;
@@ -276,8 +291,7 @@
                     }
                 }
             });            
-          
-            
+                      
         </script>
     </body>
 </html>
