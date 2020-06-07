@@ -1,84 +1,113 @@
 <html>
     <head>
         <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Snack</title>
         <link rel="stylesheet" type="text/css" href="css\Style.css">
+        <link rel="stylesheet" type="text/css" href="css\bootstrap.min.css">
+        <link rel="shortcut icon" href="favicon/favicon.ico">
+        <link rel="icon" type="image/gif" href="favicon/favicon.png">
     </head>
-    <body bgcolor="black"> 
-        <font color="Olive" face="Comic Sans MS,arial">
-        <h1 align="center"><i>Snake</i></h1>     
-        <div id= "contendorImg" style="display:none">
-          <img id= "1" src="imagen\aguacate.png">
-          <img id= "2" src="imagen\cereza.png"  >
-          <img id= "3" src="imagen\fresa.png"   >
-          <img id= "4" src="imagen\mango.png"   >
-          <img id= "5" src="imagen\diamante.png" >
-          <img id= "6" src="imagen\platano.png" >
+    <body> 
+        <font color="#d9bf77" face="Comic Sans MS,arial">
+        <div class ="cabecera">      
+            <h1 style="font-size:10vw; text-align:center;">Snake</h1>
         </div> 
-        <div id= "contendorImgSerp" style="display:none">            
-            <img id = "pielSerpiente" src="imagen\pielserpiente1.png" >
-            <img id = "cabezaSerpiente" src="imagen\cabezaserpiente.png" >
-        </div>
 
-    
-        <div id="tiempoc"> 
-            <h3 align="left"><i>Tiempo</i></h3>  
-            <p id= "Tiempo">
-                <span id= "minutos">00</span>:<span id= "segundos">00</span>
-            </p> 
-            <h3 align="left"><i>Puntuacion</i></h3> 
-            <p id= "puntos">
-                <span id= "puntosactual">0000000000</span>
-            </p>  
-            <h3 align="left"><i>Puntuacion Ant</i></h3>
-            <p id= "puntosAnt">
-                <span id= "puntosanterior">0000000000</span>
-            </p> 
-            <button class="button button1" onclick="gameOver('Reinicio')">Reinicio</button>
-         <!--  <div id= "im"> 
-            <img id="serpiente" src="imagen\serpiente2.png" > 
-            </div>
-            --> 
+        <div id= "contendorImg" style="display:none">
+            <img id= "1" src="imagen\aguacate.png">
+            <img id= "2" src="imagen\cereza.png"  >
+            <img id= "3" src="imagen\fresa.png"   >
+            <img id= "4" src="imagen\mango.png"   >
+            <img id= "5" src="imagen\diamante.png" >
+            <img id= "6" src="imagen\platano.png" >
         </div>
-    
-        <div id ="contenedor">
+        
+        <div style="display:none"> 
+            <img id = "cabezaSerpiente" src="imagen\cabezaserpiente.png">           
+            <img id = "pielSerpiente"   src="imagen\pielSerpiente.png">            
+        </div>   
+
+        <div class="left">          
+            <div class = "organizarDatos">         
+                <h3 align="left"><i>Tiempo</i></h3>  
+                <p id= "Tiempo">
+                    <span id= "minutos">00</span>:<span id= "segundos">00</span>
+                </p> 
+                <h3 align="left"><i>Puntuacion</i></h3> 
+                <p id= "puntos">
+                    <span id= "puntosactual">0000000000</span>
+                </p>  
+                <h3 align="left"><i>Puntuacion Ant</i></h3>
+                <p id= "puntosAnt">
+                    <span id= "puntosanterior">0000000000</span>
+                </p>
+                <div id = "botonReinicio" ><a class="buttonReinicio" onclick="gameOver('Reinicio')" role="button">Reinicio</a></div>
+            </div>    
+        </div>
+        
+        <div class ="contenedorCanvas"> 
+            <div id = "botonFacil"><a class="botonFacilFlotante" role = "button">Facil</a></div> 
+            <div id = "botonDificil"><a class="botonDificilFlotante" role="button">Dificil</a></div>             
+            <div id = "botonJugar" ><a class="botonJugarFlotante" role="button">Jugar</a></div> 
             <canvas  id="CanvaSN1" width="800" height="800">
             </canvas>             
-        </div> 
-        
+        </div>    
+
+        <audio id="audioGameOver" controls>
+            <source id = "gameoFT" type="audio/mpeg" src="Sonidos\GameOverSound.mp3">
+        </audio> 
+        <audio id="audioComerFruta" controls>
+            <source id = "comerFT" type="audio/mpeg" src="Sonidos\poing.mp3">
+        </audio> 
+        <audio id="audiojuego" controls> 
+            <source id = "comerFT" type="audio/mpeg" src="Sonidos\todoJuego.mp3">
+        </audio> 
+        <audio id="audioCoqueSnake" controls>
+            <source id = "comerFT" type="audio/mpeg" src="Sonidos\choqueSnake.mp3">
+        </audio> 
+
         <script>
             var c = document.getElementById("CanvaSN1");
             var ctx = c.getContext("2d");
             var contendorImagenes = document.getElementById('contendorImg');
-            var contendorImagenesSerp = document.getElementById('pielSerpiente');
-            var contendorCabezaSerp = document.getElementById('cabezaSerpiente');
+            var cabezaSnake = document.getElementById('cabezaSerpiente');
+            var pielSnake = document.getElementById('pielSerpiente');  
+            var botonJuego =  document.getElementById('botonJugar');      
+            var botonFacil = document.getElementById('botonFacil'); 
+            var botonDificil = document.getElementById('botonDificil');   
+            var botonReinicio = document.getElementById('botonReinicio');
+            var sonidoComer = document.getElementById('audioComerFruta');
+            var sonidoGame = document.getElementById('audioGameOver');
+            var sonidoJuego = document.getElementById('audiojuego');
+            var sonidoChoqueSnake= document.getElementById('audioCoqueSnake');
             var listaDeImagenes = [];               
-            var interval = {facil:300 , dificil:100};
+            var velocidadMovimiento = {facil:300 , dificil:100};
             var DIMENSION = 40;
-            var CUADROSNAKE = c.width/DIMENSION;
-            var intervalID = 0;    
-            var cronometro = 0;         
-            var movimiento = null; 
-            var pos = null;
-            var fruta = null;  
-            var snake = null;
-            var snakeLong = null;
-            var finJuego = null;
-            var usado = null;
-            var pausa = null;
-            var puntuacionAnterior = null;
-            var puntuacion = null;
-            var secs = null;
-            var mins = null;            
+            var CUADROSNAKE = c.width/DIMENSION
+                ,intervalID = 0
+                ,cronometro = 0       
+                ,movimiento = null
+                ,pos = null
+                ,fruta = null
+                ,snake = null
+                ,snakeLong = null
+                ,finJuego = null
+                ,movimientoProcesado = null
+                ,pausa = null
+                ,puntuacionAnterior = null
+                ,puntuacion = null
+                ,secs = null
+                ,mins = null;    
 
             for (let i = 0; i < contendorImagenes.childNodes.length; i++) {
                 if(contendorImagenes.childNodes[i] && contendorImagenes.childNodes[i].tagName == "IMG")
                     listaDeImagenes.push(contendorImagenes.childNodes[i]);                    
             }
 
-            var image = listaDeImagenes[0];
+            var imageFruta = listaDeImagenes[0];
 
-            function estiloGradientFont() {
+            function aplicarEstiloDegradadoLetras() {
                 ctx.font = "100px Candara";
                 var gradient = ctx.createLinearGradient(0, 0, c.width, 0);
                 gradient.addColorStop("0", "olive");
@@ -87,22 +116,68 @@
                 ctx.fillStyle = gradient;
                 ctx.textAlign = "center";
                 ctx.textBaseline = "middle";               
-            }     
+            }  
 
-            function inicializarJuego() {
+            function ocultarBoton(elementoVisible){
+                elementoVisible.style.display = 'none';
+            }
+
+            function mostrarBoton(elementoOculto){
+                elementoOculto.style.display = 'block';                
+            }
+
+            function escucharAccionBoton(elementoClick, tipoDificultad){
+                elementoClick.addEventListener('click', function(ev) {
+                    if (elementoClick == botonJuego){
+                        mostrarBoton(botonFacil);
+                        mostrarBoton(botonDificil);
+                        botonJuego.style.pointerEvents = 'none';  
+                    } else {
+                        ocultarBoton(botonFacil);
+                        ocultarBoton(botonDificil);
+                        ocultarBoton(botonJuego);
+                        iniciaJuego(tipoDificultad); 
+                    }                      
+                }, false);
+            }
+
+            function asignarValorRandom(limiteMaximo) {
+                return {
+                    x: Math.floor(Math.random() * limiteMaximo),
+                    y: Math.floor(Math.random() * limiteMaximo)              
+                };
+            }
+
+            function compararUbicacionObjetos(valorA, valorB) {
+                if (valorA.x == valorB.x && valorA.y == valorB.y) {
+                    return true;
+                } else {
+                    return false;
+                }                
+            }
+
+            function pintarImagen(contexto, imagenSeleccionada, posicionImgagen, dimensionImagen){
+                contexto.drawImage(imagenSeleccionada, posicionImgagen.x * dimensionImagen, posicionImgagen.y * dimensionImagen, dimensionImagen ,dimensionImagen );            
+            } 
+
+            function reiniciarValores() {
                 movimiento = {x:0 , y:0}; 
                 pos = {x:0 , y:0};
                 fruta = {x:0 , y:0};  
                 snake = new Array ();
                 snakeLong = 0;
                 finJuego = false;
-                usado = false;
+                movimientoProcesado = false;
                 pausa = false;
                 posicionarFruta (pos, snake);
                 posicionarSnake (fruta);
                 snake.unshift({x:pos.x, y:pos.y});
                 snakeLong = 1; 
+                ocultarBoton(botonFacil);
+                ocultarBoton(botonDificil);
+                ocultarBoton(botonReinicio);
                 puntuacion = 0;
+                puntuacionAct(); 
                 secs = 0;
                 mins = 0;  
                         
@@ -112,64 +187,57 @@
                 ctx.fillStyle = "#ffffff";
                 ctx.fillRect(0,0,c.width,c.height);
             }
-
-            function menu() {  
-                vaciarPantalla();
-                estiloGradientFont(); 
-                ctx.fillText("Nivel:", c.width/2, c.height/4); 
-                ctx.textAlign = "left"; 
-                ctx.fillText("* Facil", c.width/3, c.height/2,);            
-                ctx.fillText("* Dificil", c.width/3, c.height/1.5); 
-                   
-            }
-
-            function gameOver(mensaje) {                
+            
+            function gameOver() {
+                finJuego = true;             
                 vaciarPantalla();  
-                estiloGradientFont();  
-                ctx.fillText(mensaje, c.width/2, c.height/2);                
-                clearInterval(intervalID);
-                inicializarJuego();
-                var newGameId = setInterval(newGame, 3000);
+                aplicarEstiloDegradadoLetras();  
+                sonidoGame.play();        
+                ctx.fillText("Game over", c.width/2, c.height/2);
+                clearInterval(intervalID);                
+                reiniciarValores();
+                var newGameId = setInterval(newGame, 1000);
                 function newGame() {
-                    menu();                    
+                    vaciarPantalla();                    
+                    mostrarBoton(botonJuego);
+                    botonJuego.style.pointerEvents = 'auto';
                     clearInterval(newGameId);                    
                 }          
             }            
-
-            function InicioTiempo() {
+            
+            function InicioTiempo(segundosT, minutosT) { 
                 segundos = 0;
                 s = document.getElementById("segundos"); 
                 m = document.getElementById("minutos");
 
                 cronometro = setInterval(function() {
-                    if (pausa == false) {
+                    if (pausa == false && finJuego ==  false && botonJuego.style.display == 'none') {
                         segundos++;
-
-                        secs = segundos;
-                        mins = 0;
-                        while (secs>=60) {
-                            mins++;
-                            secs-=60;
+                        segundosT = segundos;
+                        minutosT = 0;
+                        while (segundosT>=60) {
+                            minutosT++;
+                            segundosT-=60;
                         }
                     }
 
-                    if (mins<10) {
-                        m.innerHTML = "0" + mins;                        
+                    if (minutosT<10) {
+                        m.innerHTML = "0" + minutosT;                        
                     } else {
-                        m.innerHTML = mins;
+                        m.innerHTML = minutosT;
                     }
 
-                    if (secs<10) {
-                        s.innerHTML = "0" + secs;                        
+                    if (segundosT<10) {
+                        s.innerHTML = "0" + segundosT;                        
                     } else {
-                        s.innerHTML = secs;
+                        s.innerHTML = segundosT;
                     }
 
-                    total_secs = secs;
+                    total_secs = segundosT;
                     
                 }, 1000);               
             }
-
+            
             function puntuacionAct() {
                 pts = document.getElementById("puntosactual");
                 ptsStr = "0000000000"+puntuacion;
@@ -181,82 +249,42 @@
                 ptsStrAnt = "0000000000"+puntuacionAnterior;
                 ptsAnt.innerHTML = ptsStrAnt.substr(-10);;
             }
-
-            function iniciaDificultad(nivel) {
-                vaciarPantalla();
+            
+            function iniciaJuego(Dificultad) {
+                vaciarPantalla();                
                 jugar();
-                InicioTiempo();
-                intervalID = setInterval(jugar, nivel);
-                
+                InicioTiempo(0, 0);
+                intervalID = setInterval(jugar, Dificultad);
             }
 
-            function elegirDificultad(e) {      
-                if(pausa == false ){        
-                    var p = evaluacionClickDificultad(e);                
-                    if (p.x >= 280 && p.x <= 280 + 251 &&
-                        p.y >= 361 && p.y <= 361 + 73) {
-                            iniciaDificultad(interval.facil); 
-                    } else if (p.x >= 280 && p.x <= 280 + 292 &&
-                            p.y >= 495 && p.y <= 495 + 73) {           
-                            iniciaDificultad(interval.dificil);                     
-                    } else {
-                        menu();
-                    }
-                } 
-            }
-
-            function evaluacionClickDificultad(e) {
-                var r = c.getBoundingClientRect();  
-                return {
-                    x: e.clientX - r.left,
-                    y: e.clientY - r.top                    
-                };
-            }
-
-            function posicionarFruta(pos, snake) {
-                fruta.x = Math.floor(Math.random() * CUADROSNAKE);
-                fruta.y = Math.floor(Math.random() * CUADROSNAKE);
-
-                while (  (fruta.x == pos.x && fruta.y == pos.y)  || coincidenciaPosicion(snake, fruta.x, fruta.y) != -1 ) {
-                    fruta.x = Math.floor(Math.random() * CUADROSNAKE);
-                    fruta.y = Math.floor(Math.random() * CUADROSNAKE);
+            function posicionarFruta(posSnake, valorSnake) {
+                fruta = asignarValorRandom(CUADROSNAKE); 
+                while (  compararUbicacionObjetos(fruta, posSnake)  || coincidenciaPosicionSnake(valorSnake, fruta) != -1 ) {
+                    fruta = asignarValorRandom(CUADROSNAKE);
                 }                
             }
 
-            function posicionarSnake(fruta) {
-                pos.x = Math.floor(Math.random() * CUADROSNAKE);
-                pos.y = Math.floor(Math.random() * CUADROSNAKE);
-
-                while (fruta.x == pos.x && fruta.y == pos.y) {
-                    pos.x = Math.floor(Math.random() * CUADROSNAKE);
-                    pos.y = Math.floor(Math.random() * CUADROSNAKE);
+            function posicionarSnake(posicionFrutaAct) {
+                pos = asignarValorRandom(CUADROSNAKE);                
+                while (compararUbicacionObjetos(posicionFrutaAct, pos)) {
+                    pos = asignarValorRandom(CUADROSNAKE);
                 }                
             }
 
-            function coincidenciaPosicion(snake, x, y) {          
-                for (let i = 0; i < snake.length; i++) {
-                    if(snake[i].x == x && snake[i].y == y) {
+            function coincidenciaPosicionSnake(valorSnake, cordenadaXY) {          
+                for (let i = 0; i < valorSnake.length; i++) {
+                    if(valorSnake[i].x == cordenadaXY.x && valorSnake[i].y == cordenadaXY.y) {
                         return 1;
                     }                    
                 } 
                 return -1;                           
             }
-
-            function pintarFruta(x, y) {
-                ctx.drawImage(image, x * DIMENSION, y * DIMENSION, DIMENSION ,DIMENSION );
-            }
             
-            function pintarSnake(x,y, valor) {
-                if (valor == 1){
-                    ctx.drawImage(contendorImagenesSerp, x * DIMENSION, y * DIMENSION, DIMENSION ,DIMENSION );   
-                } else {
-                    ctx.drawImage(contendorCabezaSerp, x * DIMENSION, y * DIMENSION, DIMENSION ,DIMENSION );   
-                }      
-            }
-
             function jugar() {
-                if (pausa == false) {                                               
-                    puntuacionAct(); 
+                if (pausa == false) {  
+                    sonidoJuego.play();                                            
+                    puntuacionAct();
+                    mostrarBoton(botonReinicio);
                     vaciarPantalla(); 
                     if (movimiento.x != 0 || movimiento.y != 0){
                         pos.x = snake[0].x + movimiento.x;
@@ -274,80 +302,84 @@
                         if (pos.y > CUADROSNAKE -1)  {
                             pos.y = 0;
                         }
-                        
-                        if (pos.x == fruta.x && pos.y == fruta.y) {
+                                                
+                        if (compararUbicacionObjetos(pos, fruta)) {
                             snakeLong = snakeLong + 1;  // come fruta  
-                            if (image.id == 5){
-                                puntuacion = puntuacion + 500;
+                            if (imageFruta.id == 5){
+                               puntuacion = puntuacion + 500;
                             } else {
-                                puntuacion = puntuacion + 100;                       
+                               puntuacion = puntuacion + 100;                       
                             }  
-                            image = listaDeImagenes[Math.floor(Math.random() * listaDeImagenes.length)]                 
-                            posicionarFruta (pos, snake);
+                            sonidoComer.play();
+                            imageFruta = listaDeImagenes[Math.floor(Math.random() * listaDeImagenes.length)];
+                            posicionarFruta (pos, snake);                            
                         } else {
                             snake.pop();
                         }
 
-                        if (coincidenciaPosicion(snake, pos.x, pos.y) != -1){
+                        if (coincidenciaPosicionSnake(snake, pos) != -1){   
+                            sonidoChoqueSnake.play();                         
                             clearInterval(cronometro);
                             vaciarPantalla();                              
-                            finJuego =  true;
+                            finJuego =  true; 
+                            sonidoJuego.pause(); 
                         }
                         snake.unshift({x:pos.x, y:pos.y});                
                     }
+                    
                     if (finJuego == false) {
                         for (let i = 0; i < snakeLong; i++) {
                             if (i == 0) {
-                                pintarSnake(snake[i].x, snake[i].y, 0);
-                            } else {
-                                pintarSnake(snake[i].x, snake[i].y, 1);       
-                            }                                                                        
-                        }
-                        pintarFruta(fruta.x,fruta.y); 
+                                pintarImagen(ctx, cabezaSnake, snake[i], DIMENSION);
+                            } else{
+                                pintarImagen(ctx, pielSnake, snake[i], DIMENSION);
+                            }
+                        }                        
+                        pintarImagen(ctx, imageFruta, fruta, DIMENSION);
                     } else {   
                         puntuacionAnterior = puntuacion;                          
-                        puntuacionAnt();
-                        gameOver("Game over");                                  
+                        puntuacionAnt();                         
+                        gameOver();
                     }
-                    usado = true;                   
+                    movimientoProcesado = true;                  
                 }                             
-            }             
-               
-            menu();
-
-            c.addEventListener('click', elegirDificultad, false);
-
-            inicializarJuego();            
+            }     
             
-            document.addEventListener('keydown', (event) => {
+            escucharAccionBoton(botonJuego, 1);
+            escucharAccionBoton(botonFacil, velocidadMovimiento.facil);
+            escucharAccionBoton(botonDificil, velocidadMovimiento.dificil);
+            reiniciarValores();  
+
+            document.addEventListener('keydown', (event) => {               
                 
-                if (event.keyCode != 37 || event.keyCode != 38 || event.keyCode != 39 || event.keyCode != 40 ) {
-                    pausa = true;
-                } if (event.keyCode == 37 || event.keyCode == 38 || event.keyCode == 39 || event.keyCode == 40 ) {
+                if (event.keyCode == 65 || event.keyCode == 87 || event.keyCode == 68 || event.keyCode == 83  ) {
                     pausa = false;
+                } else {
+                    pausa = true;
                 }
-                if(usado == true){
-                    usado = false;
+
+                if(movimientoProcesado == true){
+                    movimientoProcesado = false;
                     switch (event.keyCode) {
-                        case 37:
+                        case 65:
                             if (movimiento.x != 1){
                                 movimiento.x = -1;
                                 movimiento.y = 0;                                
                             }
                         break;
-                        case 38:
+                        case 87:
                             if (movimiento.y != 1){
                                 movimiento.x = 0;
                                 movimiento.y = -1;
                             }
                         break;
-                        case 39:
+                        case 68:
                             if (movimiento.x != -1){
                                 movimiento.x = 1;
                                 movimiento.y = 0;
                             }
                         break;
-                        case 40:
+                        case 83 :
                             if (movimiento.y != -1){
                                 movimiento.x = 0;
                                 movimiento.y = 1;
@@ -355,8 +387,7 @@
                         break;        
                     }
                 }
-            });            
-                       
+            });
         </script>
     </body>
 </html>
